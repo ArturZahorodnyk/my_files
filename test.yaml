@@ -1,16 +1,20 @@
 ---
-- name: install tomcat server
-  hosts: ec2-test
-  become: true
+- name: install server
+  hosts: test 
 
   tasks:
   - name: install git
     yum: 
       name: git
+  
+  - name: install java
+    yum: 
+      name: java-11-openjdk-devel
+
 
   - name: install maven
     yum:
-      name: maven
+      name: maven  
 
   - name: pull project
     git: 
@@ -23,5 +27,11 @@
   - name: build project
     shell: 'mvn -f /home/ec2-user/git package'
 
-  - name: run porject
-    shell: 'mvn -f /home/ec2-user/git spring-boot:run spring-boot:run -Dspring-boot.run.profiles=mysql'
+  - name: init systemctl
+    copy: 
+      src: ./files/petclinic.service
+      dest: /etc/systemd/system
+
+
+  - name: run project
+    shell: 'systemctl start petclinic.service'
