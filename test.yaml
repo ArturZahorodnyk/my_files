@@ -1,0 +1,27 @@
+---
+- name: install tomcat server
+  hosts: ec2-test
+  become: true
+
+  tasks:
+  - name: install git
+    yum: 
+      name: git
+
+  - name: install maven
+    yum:
+      name: maven
+
+  - name: pull project
+    git: 
+      repo: 'https://github.com/spring-projects/spring-petclinic.git'
+      dest: /home/ec2-user/git
+      clone: yes
+      update: yes
+
+
+  - name: build project
+    shell: 'mvn -f /home/ec2-user/git package'
+
+  - name: run porject
+    shell: 'mvn -f /home/ec2-user/git spring-boot:run spring-boot:run -Dspring-boot.run.profiles=mysql'
